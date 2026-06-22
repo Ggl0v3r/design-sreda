@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Процесс работы — Дизайн среда</title>
+<meta name="description" content="Как мы работаем над интерьером: от консультации и перепланировки до подбора материалов и сдачи объекта.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230F0F1A'/%3E%3Cpath d='M16 52V28a16 16 0 0132 0v24' fill='none' stroke='%237B8CDE' stroke-width='4'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .detail-process{display:flex;flex-direction:column;gap:0;margin-top:20px;}
+  .d-step{display:grid;grid-template-columns:90px 1fr;gap:30px;padding:42px 0;border-top:1px solid var(--line);}
+  .d-step:first-child{border-top:none;}
+  @media (max-width:700px){ .d-step{grid-template-columns:56px 1fr;gap:20px;} }
+  @media (max-width:480px){ .d-step{grid-template-columns:1fr;gap:8px;} .d-step .num{font-size:1.4rem;} }
+  .d-step .num{font-family:'Space Grotesk',sans-serif;font-size:2.2rem;font-weight:600;color:var(--terracotta-deep);opacity:.7;}
+  .d-step h3{font-size:1.5rem;margin-bottom:10px;}
+  .d-step p{color:var(--charcoal-2);max-width:620px;}
+  .d-step .meta{margin-top:14px;font-family:'Space Grotesk',sans-serif;font-size:.8rem;letter-spacing:.04em;text-transform:uppercase;color:var(--brass);}
+
+  @media (max-width:480px){
+    .d-step{padding:28px 0;}
+    .d-step .num{font-size:1.6rem;}
+    .d-step h3{font-size:1.2rem;}
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav" id="nav">
+  <div class="container">
+    <a href="index.html" class="logo">
+      <svg class="mark" viewBox="0 0 24 24" fill="none"><path d="M5 19V11a7 7 0 0114 0v8" stroke-width="2"/></svg>
+      Дизайн среда
+    </a>
+    <div class="nav-links">
+      <a href="about.html">Студия</a>
+      <a href="process.html" class="active">Процесс</a>
+      <a href="work.html">Работы</a>
+      <a href="calculator.html">Калькулятор</a>
+      <a href="contacts.html">Контакты</a>
+    </div>
+    <div class="nav-cta">
+      <a class="btn btn-ghost" href="https://t.me/designsreda_ufa" target="_blank" rel="noopener">Канал</a>
+      <a class="btn btn-accent" href="calculator.html"><span class="full">Рассчитать ремонт</span></a>
+    </div>
+    <button class="burger" id="burgerBtn" aria-label="Открыть меню"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-close" id="mobileClose" aria-label="Закрыть меню">✕</button>
+  <a href="about.html">Студия</a>
+  <a href="process.html">Процесс</a>
+  <a href="work.html">Работы</a>
+  <a href="contacts.html">Контакты</a>
+  <a class="btn btn-accent mm-cta" href="calculator.html">Рассчитать ремонт</a>
+</div>
+
+<main>
+
+  <section class="page-hero container">
+    <p class="breadcrumb"><a href="index.html">Главная</a> / Процесс</p>
+    <p class="eyebrow">Как мы работаем</p>
+    <h1>Четыре шага от стен «как есть» до сдачи под ключ</h1>
+    <p class="lead">Никаких сюрпризов в середине проекта: на каждом шаге понятно, что происходит и кто за это отвечает.</p>
+  </section>
+
+  <section style="padding-top:0;">
+    <div class="container">
+      <div class="detail-process">
+        <div class="d-step reveal">
+          <span class="num">01</span>
+          <div>
+            <h3>Консультация и техническое задание</h3>
+            <p>Разбираем планировку, привычки и список «не могу без этого». Смотрим, что реально несущее, а что можно сносить. Здесь чаще всего подключается Артём — с инженерной стороной вопроса.</p>
+            <p class="meta">Обычно 1–2 встречи</p>
+          </div>
+        </div>
+        <div class="d-step reveal">
+          <span class="num">02</span>
+          <div>
+            <h3>Концепция и перепланировка</h3>
+            <p>Архитектурные решения, зонирование, арки и проёмы — там, где они нужны по смыслу, а не по моде. Сложные перепланировки иногда разбираем в прямом эфире канала, чтобы подписчики видели логику решений вживую.</p>
+            <p class="meta">Чертежи + 3D-визуализация</p>
+          </div>
+        </div>
+        <div class="d-step reveal">
+          <span class="num">03</span>
+          <div>
+            <h3>Подбор и «анпакинг»</h3>
+            <p>Техника, материалы, поставщики — с честным сравнением цены и качества, без накруток за бренд ради бренда. Каждую крупную посылку показываем в канале — рубрика, которую читатели ждут не меньше, чем финальные фото.</p>
+            <p class="meta">Закупки и логистика</p>
+          </div>
+        </div>
+        <div class="d-step reveal">
+          <span class="num">04</span>
+          <div>
+            <h3>Реализация и сдача</h3>
+            <p>Авторский надзор до последней скрытой полочки для шампуней. Если что-то идёт не по плану — например, бракованная сантехника — решаем вопрос открыто, а не молча.</p>
+            <p class="meta">Авторский надзор на объекте</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-block">
+    <div class="container">
+      <p class="eyebrow center">Бюджет</p>
+      <h2>Прикинуть стоимость можно заранее</h2>
+      <p class="lead">Площадь, формат работы и сложность планировки — и вы увидите вилку цен за пару минут.</p>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="calculator.html">Рассчитать ремонт →</a>
+        <a class="btn btn-ghost" href="contacts.html">Задать вопрос</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="container">
+    <a href="index.html" class="logo" style="font-size:1rem;">Дизайн среда © 2026</a>
+    <div class="f-links">
+      <a href="https://t.me/designsreda_ufa" target="_blank" rel="noopener">Telegram-канал</a>
+      <a href="https://instagram.com/design.sreda" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://t.me/Artzakr" target="_blank" rel="noopener">@Artzakr</a>
+      <a href="https://t.me/mariazakruzhnaya" target="_blank" rel="noopener">@mariazakruzhnaya</a>
+    </div>
+    <p class="f-note">Студия интерьеров · Уфа</p>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

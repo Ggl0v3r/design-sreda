@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Студия — Дизайн среда, Артём и Мария Закружные</title>
+<meta name="description" content="Семейная студия интерьеров Артёма и Марии Закружных. Подход к дизайну, философия и честный процесс работы.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230F0F1A'/%3E%3Cpath d='M16 52V28a16 16 0 0132 0v24' fill='none' stroke='%237B8CDE' stroke-width='4'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .about-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:64px;}
+  @media (max-width:768px){ .about-grid{grid-template-columns:1fr;gap:32px;} }
+
+  .about-duo{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;}
+  @media (max-width:768px){ .about-duo{grid-template-columns:1fr;gap:32px;} }
+</style>
+</head>
+<body>
+
+<nav class="nav" id="nav">
+  <div class="container">
+    <a href="index.html" class="logo">
+      <svg class="mark" viewBox="0 0 24 24" fill="none"><path d="M5 19V11a7 7 0 0114 0v8" stroke-width="2"/></svg>
+      Дизайн среда
+    </a>
+    <div class="nav-links">
+      <a href="about.html" class="active">Студия</a>
+      <a href="process.html">Процесс</a>
+      <a href="work.html">Работы</a>
+      <a href="calculator.html">Калькулятор</a>
+      <a href="contacts.html">Контакты</a>
+    </div>
+    <div class="nav-cta">
+      <a class="btn btn-ghost" href="https://t.me/designsreda_ufa" target="_blank" rel="noopener">Канал</a>
+      <a class="btn btn-accent" href="calculator.html"><span class="full">Рассчитать ремонт</span></a>
+    </div>
+    <button class="burger" id="burgerBtn" aria-label="Открыть меню"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-close" id="mobileClose" aria-label="Закрыть меню">✕</button>
+  <a href="about.html">Студия</a>
+  <a href="process.html">Процесс</a>
+  <a href="work.html">Работы</a>
+  <a href="contacts.html">Контакты</a>
+  <a class="btn btn-accent mm-cta" href="calculator.html">Рассчитать ремонт</a>
+</div>
+
+<main>
+
+  <section class="page-hero container">
+    <p class="breadcrumb"><a href="index.html">Главная</a> / Студия</p>
+    <p class="eyebrow">Студия</p>
+    <h1>Семейная мастерская на два голоса</h1>
+    <p class="lead">Один проект — два взгляда на каждую деталь: техническая логика Артёма и стилевая точность Марии встречаются на каждом объекте.</p>
+  </section>
+
+  <section class="dark-section" id="duo">
+    <div class="container">
+      <div class="duo-grid">
+        <div class="person reveal">
+          <div class="avatar">АЗ</div>
+          <h3>Артём Закружный</h3>
+          <p>Технические разговоры, инженерия, перепланировки и согласования — обычно к нему обращаются на старте, когда нужно понять, что вообще можно сделать с этими стенами.</p>
+          <a class="btn btn-ghost on-dark" href="https://t.me/Artzakr" target="_blank" rel="noopener">Поговорить с Артёмом ↗</a>
+        </div>
+        <div class="person reveal">
+          <div class="avatar">МЗ</div>
+          <h3>Мария Закружная</h3>
+          <p>Концепция, стиль и каждая полочка в проекте. Ведёт канал и рассказывает о процессе честно — с факапами и восторгами в одной ленте.</p>
+          <a class="btn btn-ghost on-dark" href="https://t.me/mariazakruzhnaya" target="_blank" rel="noopener">Написать Марии ↗</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="philosophy">
+    <div class="container about-grid">
+      <div class="reveal">
+        <p class="eyebrow">Подход</p>
+        <h2 style="font-size:clamp(1.9rem,2.6vw + .6rem,2.7rem);margin-top:14px;">Нарядно — не&nbsp;значит безвкусно</h2>
+      </div>
+      <div class="reveal">
+        <p style="color:var(--charcoal-2);margin-bottom:20px;">Часто просят «сделать понаряднее». Самый лёгкий путь — закатать всё в резные багеты и пёстрый мрамор. Мы выбираем путь сложнее: декор точечно, там, где он держит композицию, а не закрывает пустоту. Мрамор — только благородный, без перебора с рисунком.</p>
+        <p class="pull">Арка появляется не потому, что модно. А потому что именно ею комната делится на зоны — рабочий уголок, место для красоты, диван для подруг.</p>
+        <p style="color:var(--charcoal-2);margin-bottom:20px;">То же с инженерией: техника подбирается по соотношению цены и качества, а не по красивой коробке. Колонки и пианино получают звукоизоляцию до того, как въедет рояль. Шкаф появляется там, где руки сами тянутся за полотенцем — за зеркалом, а не в коридоре.</p>
+        <p style="color:var(--charcoal-2);">Если в процессе что-то идёт не по плану — например, сантехника пришла с браком за неделю до укладки плитки — мы не прячем это за глянцевыми фото. Решаем, показываем, как вышли из положения, и двигаемся дальше.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="dark-section">
+    <div class="container about-duo">
+      <div class="reveal">
+        <p class="eyebrow on-dark">Без глянца</p>
+        <h2 style="font-size:clamp(1.9rem,2.6vw + .6rem,2.6rem);margin:14px 0 20px;">Показываем процесс, а не только финальный кадр</h2>
+        <p style="margin-bottom:16px;">Большинство студий публикуют только идеальные фото после клининга. Мы каждый день ведём канал о том, что происходит между «было» и «стало» — включая моменты, которые не всегда красивые.</p>
+        <div class="rubric-list">
+          <div class="item"><span class="dot"></span><div><b>Прямые эфиры о перепланировках</b><span>Разбираем реальные планировки в прямом эфире — «народный сериал», как называют его подписчики.</span></div></div>
+          <div class="item"><span class="dot"></span><div><b>Рубрика «Анпакинг»</b><span>Распаковываем технику и материалы на объекте — честно показываем, что приехало и как это выглядит вживую.</span></div></div>
+          <div class="item"><span class="dot"></span><div><b>Хроника объектов в работе</b><span>Не только финал — детали, процесс монтажа и решения по ходу стройки.</span></div></div>
+        </div>
+      </div>
+      <div class="glass-card reveal">
+        <svg class="arch-mini" viewBox="0 0 64 64" fill="none"><path d="M10 54V30a22 22 0 0144 0v24" stroke-width="2.5"/></svg>
+        <p>«Беда-беда, огорчение» — так у нас называется честный рассказ о факапах. Когда дорогая сантехника пришла с браком, мы не стали искать виноватых — нашли решение и показали его в канале, как и обещали клиенту.</p>
+        <p class="signoff">— из переписки с подписчиками канала «Дизайн среда»</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-block">
+    <div class="container">
+      <p class="eyebrow center">Дальше</p>
+      <h2>Хотите увидеть, как мы работаем по шагам?</h2>
+      <p class="lead">От первого разговора до сдачи объекта — без сюрпризов в середине.</p>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="process.html">Как мы работаем →</a>
+        <a class="btn btn-ghost" href="work.html">Смотреть проекты</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="container">
+    <a href="index.html" class="logo" style="font-size:1rem;">Дизайн среда © 2026</a>
+    <div class="f-links">
+      <a href="https://t.me/designsreda_ufa" target="_blank" rel="noopener">Telegram-канал</a>
+      <a href="https://instagram.com/design.sreda" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://t.me/Artzakr" target="_blank" rel="noopener">@Artzakr</a>
+      <a href="https://t.me/mariazakruzhnaya" target="_blank" rel="noopener">@mariazakruzhnaya</a>
+    </div>
+    <p class="f-note">Студия интерьеров · Уфа</p>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

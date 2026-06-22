@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Вход — Админ-панель</title>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0F0F1A;--surface:#1A1A2E;--accent:#6C63FF;--text:#E8E8F0;--muted:#A0A0B8;--border:rgba(232,232,240,.15);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Work Sans',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;}
+.login-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:48px;width:100%;max-width:400px;margin:20px;}
+h1{font-family:'Space Grotesk',sans-serif;font-size:1.6rem;font-weight:600;margin-bottom:8px;}
+p{color:var(--muted);font-size:.92rem;margin-bottom:28px;}
+.field{margin-bottom:20px;}
+label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:8px;}
+input[type="password"]{width:100%;padding:14px 16px;border-radius:10px;border:1.5px solid var(--border);background:rgba(232,232,240,.04);color:var(--text);font-size:1rem;font-family:'Work Sans',sans-serif;transition:border-color .3s,box-shadow .3s;}
+input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(108,99,255,.2);}
+button{width:100%;padding:14px;border:none;border-radius:10px;background:var(--accent);color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:1rem;cursor:pointer;transition:transform .3s,box-shadow .3s;}
+button:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(108,99,255,.4);}
+.error{color:#ef4444;font-size:.85rem;margin-top:12px;display:none;}
+</style>
+</head>
+<body>
+<div class="login-card">
+  <h1>Админ-панель</h1>
+  <p>Дизайн среда — управление сайтом</p>
+  <form id="loginForm">
+    <div class="field">
+      <label for="password">Пароль</label>
+      <input type="password" id="password" placeholder="Введите пароль" autofocus>
+    </div>
+    <button type="submit">Войти</button>
+    <div class="error" id="error">Неверный пароль</div>
+  </form>
+</div>
+<script>
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const password = document.getElementById('password').value;
+  try {
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password })
+    });
+    if (res.ok) {
+      window.location.href = '/admin/';
+    } else {
+      document.getElementById('error').style.display = 'block';
+    }
+  } catch (err) {
+    document.getElementById('error').style.display = 'block';
+  }
+});
+</script>
+</body>
+</html>

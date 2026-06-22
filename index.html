@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Дизайн среда — студия интерьеров Артёма и Марии Закружных, Уфа</title>
+<meta name="description" content="Авторские интерьеры без кудрявых багетов и цыганского мрамора. Студия Артёма и Марии Закружных, Уфа.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230F0F1A'/%3E%3Cpath d='M16 52V28a16 16 0 0132 0v24' fill='none' stroke='%237B8CDE' stroke-width='4'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+
+<style>
+  .hero{
+    padding-top:172px;
+    display:grid;grid-template-columns:1.05fr .95fr;gap:50px;align-items:center;
+  }
+  @media (max-width:900px){
+    .hero{grid-template-columns:1fr;padding-top:136px;}
+    .hero-art{order:-1;max-width:260px;margin:0 auto 8px;}
+  }
+  .hero h1{font-size:clamp(2.4rem,4.4vw + .6rem,4rem);margin:18px 0 22px;}
+  .hero p.lead{font-size:1.14rem;max-width:520px;color:var(--charcoal-2);margin-bottom:32px;}
+  .hero-ctas{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:50px;}
+  .hero-art{position:relative;transition:transform .6s ease;}
+  .hero-art:hover{transform:scale(1.02);}
+  .arch-shape{width:100%;filter:drop-shadow(0 30px 50px rgba(20,16,13,.32));transition:filter .5s ease;}
+  .hero-art:hover .arch-shape{filter:drop-shadow(0 40px 60px rgba(108,99,255,.25));}
+  .sunburst{transform-origin:240px 158px;animation:spin 50s linear infinite;}
+  @media (prefers-reduced-motion:reduce){ .sunburst{animation:none;} }
+  @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+  .teaser-row{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:46px;flex-wrap:wrap;}
+  .teaser-row h2{font-size:clamp(1.8rem,2.4vw + .6rem,2.5rem);margin-top:14px;max-width:520px;}
+  .calc-banner{
+    background:var(--terracotta);color:var(--paper);border-radius:22px;
+    padding:46px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;
+    transition:transform .5s cubic-bezier(.4,0,.2,1), box-shadow .5s ease;
+  }
+  .calc-banner:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(108,99,255,.3);}
+  .calc-banner h3{font-size:clamp(1.4rem,1.6vw + .8rem,1.9rem);color:var(--paper);max-width:420px;}
+  .calc-banner p{color:rgba(239,230,210,.85);margin-top:8px;max-width:420px;font-size:.95rem;}
+  .calc-banner .btn-solid{background:var(--charcoal);}
+
+  @media (max-width:900px){
+    .calc-banner{padding:32px;flex-direction:column;text-align:center;align-items:center;}
+    .calc-banner h3{max-width:100%;}
+    .calc-banner p{max-width:100%;}
+  }
+  @media (max-width:480px){
+    .hero{padding-top:120px;gap:30px;}
+    .hero h1{font-size:1.7rem;margin:12px 0 18px;}
+    .hero p.lead{font-size:.95rem;margin-bottom:24px;}
+    .hero-ctas{margin-bottom:30px;}
+    .hero-ctas .btn{width:100%;justify-content:center;}
+    .hero-art{max-width:200px;}
+    .teaser-row h2{font-size:1.5rem;}
+    .calc-banner{padding:24px 18px;}
+    .calc-banner h3{font-size:1.2rem;}
+    .calc-banner p{font-size:.88rem;}
+  }
+
+  .approach-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:64px;}
+  @media (max-width:768px){ .approach-grid{grid-template-columns:1fr;gap:32px;} }
+</style>
+</head>
+<body>
+
+<div class="loader" id="loader">
+  <div class="loader-inner">
+    <svg class="loader-mark" viewBox="0 0 24 24" fill="none"><path d="M5 19V11a7 7 0 0114 0v8" stroke-width="2"/></svg>
+    <span class="loader-text">Дизайн среда</span>
+  </div>
+</div>
+
+<nav class="nav" id="nav">
+  <div class="container">
+    <a href="index.html" class="logo">
+      <svg class="mark" viewBox="0 0 24 24" fill="none"><path d="M5 19V11a7 7 0 0114 0v8" stroke-width="2"/></svg>
+      Дизайн среда
+    </a>
+    <div class="nav-links">
+      <a href="about.html">Студия</a>
+      <a href="process.html">Процесс</a>
+      <a href="work.html">Работы</a>
+      <a href="calculator.html">Калькулятор</a>
+      <a href="contacts.html">Контакты</a>
+    </div>
+    <div class="nav-cta">
+      <a class="btn btn-ghost" href="https://t.me/designsreda_ufa" target="_blank" rel="noopener">Канал</a>
+      <a class="btn btn-accent" href="calculator.html"><span class="full">Рассчитать ремонт</span></a>
+    </div>
+    <button class="burger" id="burgerBtn" aria-label="Открыть меню"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-close" id="mobileClose" aria-label="Закрыть меню">✕</button>
+  <a href="about.html">Студия</a>
+  <a href="process.html">Процесс</a>
+  <a href="work.html">Работы</a>
+  <a href="contacts.html">Контакты</a>
+  <a class="btn btn-accent mm-cta" href="calculator.html">Рассчитать ремонт</a>
+</div>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero container">
+    <div>
+      <p class="eyebrow">Студия интерьеров · Уфа</p>
+      <h1>Дизайн без кудрявых багетов и&nbsp;цыганского мрамора.</h1>
+      <p class="lead">Мы — Артём и Мария Закружные. Проектируем квартиры, в которых громко слушают винил, не теряют вещи в гардеробной и&nbsp;получают арку именно там, где она решает планировку — а не просто потому что модно.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-accent" href="calculator.html">Рассчитать ремонт</a>
+        <a class="btn btn-ghost" href="work.html">Смотреть работы</a>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><b>690+</b><span>фото процесса в канале</span></div>
+        <div class="stat"><b>450+</b><span>видео с объектов</span></div>
+        <div class="stat"><b>1000+</b><span>подписчиков следят за лентой</span></div>
+      </div>
+    </div>
+
+    <div class="hero-art">
+      <svg class="arch-shape" viewBox="0 0 480 600" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="archBg" cx="50%" cy="35%" r="75%">
+            <stop offset="0%" stop-color="#1E2A3A"/>
+            <stop offset="100%" stop-color="#0F1520"/>
+          </radialGradient>
+        </defs>
+        <path d="M10 590V230 A230 220 0 01470 230 V590 Z" fill="url(#archBg)"/>
+        <path d="M10 590V230 A230 220 0 01470 230 V590" fill="none" stroke="#7B8CDE" stroke-width="3"/>
+        <g class="sunburst">
+          <circle cx="240" cy="158" r="44" fill="none" stroke="#7B8CDE" stroke-width="2"/>
+          <g stroke="#7B8CDE" stroke-width="2">
+            <line x1="240" y1="96" x2="240" y2="80"/>
+            <line x1="240" y1="220" x2="240" y2="236"/>
+            <line x1="178" y1="158" x2="162" y2="158"/>
+            <line x1="302" y1="158" x2="318" y2="158"/>
+            <line x1="196" y1="114" x2="184" y2="102"/>
+            <line x1="284" y1="114" x2="296" y2="102"/>
+            <line x1="196" y1="202" x2="184" y2="214"/>
+            <line x1="284" y1="202" x2="296" y2="214"/>
+          </g>
+        </g>
+        <ellipse cx="235" cy="552" rx="150" ry="16" fill="#0A0E16"/>
+        <path d="M255 320 q-18 -16 0 -32 h90 q18 16 0 32 v110 h-90 z" fill="#6C63FF"/>
+        <path d="M250 430 h100 v34 h-100 z" fill="#4A42D9"/>
+        <line x1="262" y1="464" x2="262" y2="486" stroke="#7B8CDE" stroke-width="3"/>
+        <line x1="338" y1="464" x2="338" y2="486" stroke="#7B8CDE" stroke-width="3"/>
+        <line x1="140" y1="500" x2="140" y2="330" stroke="#7B8CDE" stroke-width="3"/>
+        <path d="M104 330 h72 l-14 -42 h-44 z" fill="none" stroke="#7B8CDE" stroke-width="2.5"/>
+        <ellipse cx="140" cy="504" rx="26" ry="6" fill="none" stroke="#7B8CDE" stroke-width="2.5"/>
+        <path d="M372 500 l10 -46 h26 l10 46 z" fill="#0A0E16" stroke="#7B8CDE" stroke-width="2"/>
+        <path d="M385 454 q-6 -34 -26 -44" fill="none" stroke="#4A5568" stroke-width="3"/>
+        <path d="M392 454 q2 -38 22 -50" fill="none" stroke="#4A5568" stroke-width="3"/>
+        <path d="M398 454 q-2 -26 10 -40" fill="none" stroke="#4A5568" stroke-width="3"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- APPROACH TEASER -->
+  <section>
+    <div class="container approach-grid">
+      <div class="reveal">
+        <p class="eyebrow">Подход</p>
+        <h2 style="font-size:clamp(1.8rem,2.4vw + .6rem,2.5rem);margin-top:14px;">Нарядно — не&nbsp;значит безвкусно</h2>
+        <a class="btn btn-ghost" style="margin-top:24px;" href="about.html">Подробнее о подходе →</a>
+      </div>
+      <div class="reveal">
+        <p style="color:var(--charcoal-2);margin-bottom:18px;">Часто просят «сделать понаряднее». Самый лёгкий путь — закатать всё в резные багеты и пёстрый мрамор. Мы выбираем путь сложнее: декор точечно, там, где он держит композицию, а не закрывает пустоту.</p>
+        <p class="pull">Арка появляется не потому, что модно. А потому что именно ею комната делится на зоны.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WORK TEASER -->
+  <section id="work-teaser">
+    <div class="container">
+      <div class="teaser-row reveal">
+        <div>
+          <p class="eyebrow">Работы</p>
+          <h2>Объекты, о которых интересно рассказывать</h2>
+        </div>
+        <a class="btn btn-ghost" href="work.html">Все проекты →</a>
+      </div>
+
+      <div class="work-grid">
+        <div class="card reveal">
+          <div class="card-carousel" data-carousel>
+            <div class="slides">
+              <img src="images/photo_1_2026-06-22_21-36-41.jpg" alt="Кухня-гостиная — вид на остров" loading="lazy">
+              <img src="images/photo_2_2026-06-22_21-36-41.jpg" alt="Кухня — рабочая зона" loading="lazy">
+              <img src="images/photo_8_2026-06-22_21-36-41.jpg" alt="Гостиная — общий вид" loading="lazy">
+            </div>
+            <div class="carousel-arrows">
+              <button class="carousel-arrow" data-prev>←</button>
+              <button class="carousel-arrow" data-next>→</button>
+            </div>
+            <div class="carousel-nav"></div>
+          </div>
+          <p class="tag">Квартира в Уфе</p>
+          <h4>Кухня-гостиная с мрамором</h4>
+          <p>Мраморный остров и рельефная стена — без лишнего декора.</p>
+        </div>
+
+        <div class="card reveal">
+          <div class="card-carousel" data-carousel>
+            <div class="slides">
+              <img src="images/photo_1_2026-06-22_21-37-07.jpg" alt="Музыкальная — джаз-постеры" loading="lazy">
+              <img src="images/photo_2_2026-06-22_21-37-07.jpg" alt="Музыкальная — общий вид" loading="lazy">
+              <img src="images/photo_3_2026-06-22_21-37-07.jpg" alt="Музыкальная — колонки" loading="lazy">
+            </div>
+            <div class="carousel-arrows">
+              <button class="carousel-arrow" data-prev>←</button>
+              <button class="carousel-arrow" data-next>→</button>
+            </div>
+            <div class="carousel-nav"></div>
+          </div>
+          <p class="tag">Для меломана</p>
+          <h4>Музыкальная комната</h4>
+          <p>Джаз-постеры, колонки Tannoy и гитары.</p>
+        </div>
+
+        <div class="card reveal">
+          <div class="card-carousel" data-carousel>
+            <div class="slides">
+              <img src="images/photo_1_2026-06-22_21-37-12.jpg" alt="Спальня — арочное зеркало" loading="lazy">
+              <img src="images/photo_2_2026-06-22_21-37-12.jpg" alt="Спальня — арочный проём" loading="lazy">
+              <img src="images/photo_3_2026-06-22_21-37-12.jpg" alt="Спальня — кровать" loading="lazy">
+            </div>
+            <div class="carousel-arrows">
+              <button class="carousel-arrow" data-prev>←</button>
+              <button class="carousel-arrow" data-next>→</button>
+            </div>
+            <div class="carousel-nav"></div>
+          </div>
+          <p class="tag">Квартира в Уфе</p>
+          <h4>Спальня с арками</h4>
+          <p>Арка делит зону сна и место для красоты.</p>
+        </div>
+
+        <div class="card reveal">
+          <div class="card-carousel" data-carousel>
+            <div class="slides">
+              <img src="images/photo_1_2026-06-22_21-37-28.jpg" alt="Ресторан — хрустальная люстра" loading="lazy">
+              <img src="images/photo_2_2026-06-22_21-37-28.jpg" alt="Ресторан — зал" loading="lazy">
+              <img src="images/photo_3_2026-06-22_21-37-28.jpg" alt="Ресторан — столы" loading="lazy">
+            </div>
+            <div class="carousel-arrows">
+              <button class="carousel-arrow" data-prev>←</button>
+              <button class="carousel-arrow" data-next>→</button>
+            </div>
+            <div class="carousel-nav"></div>
+          </div>
+          <p class="tag">Ресторан</p>
+          <h4>Ресторан с характером</h4>
+          <p>Хрустальные люстры и мраморный пол — старая Европа.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CALC BANNER -->
+  <section>
+    <div class="container">
+      <div class="calc-banner reveal">
+        <div>
+          <h3>Прикинуть бюджет можно прямо сейчас</h3>
+          <p>Площадь, формат работы, нужна ли перепланировка — три шага, и вы увидите вилку цен по проекту.</p>
+        </div>
+        <a class="btn btn-solid" href="calculator.html">Рассчитать ремонт →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIAL -->
+  <section class="testimonial dark-section">
+    <div class="container">
+      <p class="pull reveal">«Шедеврально!»</p>
+      <p class="who reveal">Заказчик — о санузле в проекте с музыкальной комнатой, ЖК «Прайм»</p>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-block">
+    <div class="container">
+      <p class="eyebrow center">Контакты</p>
+      <h2>Готовы обсудить ваш объект?</h2>
+      <p class="lead">Расскажите про планировку и пожелания — даже если из них пока ясно только «хочу арку».</p>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="https://t.me/mariazakruzhnaya" target="_blank" rel="noopener">Написать Марии</a>
+        <a class="btn btn-ghost" href="https://t.me/Artzakr" target="_blank" rel="noopener">Поговорить с Артёмом</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="container">
+    <a href="index.html" class="logo" style="font-size:1rem;">Дизайн среда © 2026</a>
+    <div class="f-links">
+      <a href="https://t.me/designsreda_ufa" target="_blank" rel="noopener">Telegram-канал</a>
+      <a href="https://instagram.com/design.sreda" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://t.me/Artzakr" target="_blank" rel="noopener">@Artzakr</a>
+      <a href="https://t.me/mariazakruzhnaya" target="_blank" rel="noopener">@mariazakruzhnaya</a>
+    </div>
+    <p class="f-note">Студия интерьеров · Уфа</p>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+<script>
+  document.body.classList.add('loader-active');
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      document.getElementById('loader').classList.add('hide');
+      document.body.classList.remove('loader-active');
+    }, 2000);
+  });
+</script>
+</body>
+</html>

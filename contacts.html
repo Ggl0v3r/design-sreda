@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Контакты — Дизайн среда</title>
+<meta name="description" content="Свяжитесь с Артёмом и Марией Закружными — студия интерьеров «Дизайн среда», Уфа.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230F0F1A'/%3E%3Cpath d='M16 52V28a16 16 0 0132 0v24' fill='none' stroke='%237B8CDE' stroke-width='4'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:10px;}
+  @media (max-width:760px){ .contact-grid{grid-template-columns:1fr;} }
+  .contact-card{
+    border:1.5px solid var(--line);border-radius:18px;padding:36px;
+    display:flex;flex-direction:column;gap:16px;
+  }
+  .contact-card .avatar{
+    width:54px;height:54px;border-radius:50%;
+    background:linear-gradient(150deg,var(--terracotta),var(--brass));
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Fraunces',serif;font-weight:600;font-size:1.2rem;color:var(--paper);
+  }
+  .contact-card h3{font-size:1.3rem;}
+  .contact-card p{color:var(--charcoal-2);font-size:.95rem;}
+  .info-row{display:flex;gap:18px;flex-wrap:wrap;margin-top:40px;}
+  .info-chip{
+    border:1px solid var(--line);border-radius:14px;padding:18px 22px;flex:1;min-width:200px;
+  }
+  .info-chip .eyebrow{margin-bottom:8px;font-size:.68rem;}
+  .info-chip p{font-size:.95rem;color:var(--charcoal-2);}
+
+  @media (max-width:480px){
+    .contact-card{padding:24px;}
+    .contact-card h3{font-size:1.15rem;}
+    .info-row{flex-direction:column;}
+    .info-chip{min-width:auto;}
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav" id="nav">
+  <div class="container">
+    <a href="index.html" class="logo">
+      <svg class="mark" viewBox="0 0 24 24" fill="none"><path d="M5 19V11a7 7 0 0114 0v8" stroke-width="2"/></svg>
+      Дизайн среда
+    </a>
+    <div class="nav-links">
+      <a href="about.html">Студия</a>
+      <a href="process.html">Процесс</a>
+      <a href="work.html">Работы</a>
+      <a href="calculator.html">Калькулятор</a>
+      <a href="contacts.html" class="active">Контакты</a>
+    </div>
+    <div class="nav-cta">
+      <a class="btn btn-ghost" href="https://t.me/designsreda_ufa" target="_blank" rel="noopener">Канал</a>
+      <a class="btn btn-accent" href="calculator.html"><span class="full">Рассчитать ремонт</span></a>
+    </div>
+    <button class="burger" id="burgerBtn" aria-label="Открыть меню"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-close" id="mobileClose" aria-label="Закрыть меню">✕</button>
+  <a href="about.html">Студия</a>
+  <a href="process.html">Процесс</a>
+  <a href="work.html">Работы</a>
+  <a href="contacts.html">Контакты</a>
+  <a class="btn btn-accent mm-cta" href="calculator.html">Рассчитать ремонт</a>
+</div>
+
+<main>
+
+  <section class="page-hero container">
+    <p class="breadcrumb"><a href="index.html">Главная</a> / Контакты</p>
+    <p class="eyebrow">Контакты</p>
+    <h1>Готовы обсудить ваш объект?</h1>
+    <p class="lead">Расскажите про планировку и пожелания — даже если из них пока ясно только «хочу арку».</p>
+  </section>
+
+  <section style="padding-top:0;">
+    <div class="container">
+      <div class="contact-grid">
+        <div class="contact-card reveal">
+          <div class="avatar">АЗ</div>
+          <h3>Артём Закружный</h3>
+          <p>Технические вопросы, перепланировки, инженерия и согласования. Хорошая точка входа, если пока непонятно, что можно сделать с планировкой.</p>
+          <a class="btn btn-solid" href="https://t.me/Artzakr" target="_blank" rel="noopener">Написать в Telegram ↗</a>
+        </div>
+        <div class="contact-card reveal">
+          <div class="avatar">МЗ</div>
+          <h3>Мария Закружная</h3>
+          <p>Концепция, стиль, материалы и весь проект от идеи до последней детали. Ведёт канал студии.</p>
+          <a class="btn btn-solid" href="https://t.me/mariazakruzhnaya" target="_blank" rel="noopener">Написать в Telegram ↗</a>
+        </div>
+      </div>
+
+      <div class="info-row reveal">
+        <div class="info-chip">
+          <p class="eyebrow">Город</p>
+          <p>Уфа и Республика Башкортостан</p>
+        </div>
+        <div class="info-chip">
+          <p class="eyebrow">Канал</p>
+          <p><a href="https://t.me/designsreda_ufa" target="_blank" rel="noopener" style="text-decoration:underline;">t.me/designsreda_ufa</a> — процесс, эфиры и «анпакинг»</p>
+        </div>
+        <div class="info-chip">
+          <p class="eyebrow">Instagram</p>
+          <p><a href="https://instagram.com/design.sreda" target="_blank" rel="noopener" style="text-decoration:underline;">design.sreda</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-block">
+    <div class="container">
+      <p class="eyebrow center">Перед разговором</p>
+      <h2>Прикиньте бюджет заранее</h2>
+      <p class="lead">Так разговор сразу пойдёт по делу — без неловкой паузы на вопрос «а сколько это будет стоить».</p>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="calculator.html">Рассчитать ремонт →</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="container">
+    <a href="index.html" class="logo" style="font-size:1rem;">Дизайн среда © 2026</a>
+    <div class="f-links">
+      <a href="https://t.me/designsreda_ufa" target="_blank" rel="noopener">Telegram-канал</a>
+      <a href="https://instagram.com/design.sreda" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://t.me/Artzakr" target="_blank" rel="noopener">@Artzakr</a>
+      <a href="https://t.me/mariazakruzhnaya" target="_blank" rel="noopener">@mariazakruzhnaya</a>
+    </div>
+    <p class="f-note">Студия интерьеров · Уфа</p>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
