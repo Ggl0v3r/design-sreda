@@ -1,0 +1,7 @@
+{
+  "outputDirectory": ".",
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/index.js" },
+    { "handle": "filesystem" }
+  ]
+}
