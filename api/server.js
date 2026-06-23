@@ -1,10 +1,17 @@
 const cookie = require('cookie');
+const Redis = require('ioredis');
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 const SECRET = process.env.SESSION_SECRET || 'design-sreda-secret-2026';
-const KV_URL = process.env.KV_REST_API_URL || '';
-const KV_TOKEN = process.env.KV_REST_API_TOKEN || '';
-const BLOB_TOKEN = process.env.BLOB_READ_WRITE_TOKEN || '';
+const REDIS_URL = process.env.REDIS_URL || '';
+
+let redis = null;
+function getRedis() {
+  if (!redis && REDIS_URL) {
+    redis = new Redis(REDIS_URL, { maxRetriesPerRequest: 3, connectTimeout: 5000, lazyConnect: true });
+  }
+  return redis;
+}
 
 const DEFAULTS = {
   content: require('../data/content.json'),
@@ -55,72 +62,25 @@ function readBody(req) {
   });
 }
 
-async function kvGet(key) {
-  if (!KV_URL) return null;
-  const res = await fetch(`${KV_URL}/get/${encodeURIComponent(key)}`, {
-    headers: { Authorization: `Bearer ${KV_TOKEN}` }
-  });
-  const data = await res.json();
-  return data.result ?? null;
-}
-
-async function kvSet(key, value) {
-  if (!KV_URL) return;
-  await fetch(`${KV_URL}/set/${encodeURIComponent(key)}`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${KV_TOKEN}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify(value)
-  });
-}
-
 async function readJSON(name) {
-  const data = await kvGet(name);
-  if (data) return data;
-  if (DEFAULTS[name]) {
-    if (KV_URL) await kvSet(name, DEFAULTS[name]);
-    return JSON.parse(JSON.stringify(DEFAULTS[name]));
+  const r = getRedis();
+  if (r) {
+    await r.connect().catch(() => {});
+    const raw = await r.get(`ds:${name}`);
+    if (raw) return JSON.parse(raw);
+    const def = JSON.parse(JSON.stringify(DEFAULTS[name]));
+    await r.set(`ds:${name}`, JSON.stringify(def));
+    return def;
   }
-  return null;
+  return JSON.parse(JSON.stringify(DEFAULTS[name]));
 }
 
 async function writeJSON(name, data) {
-  if (KV_URL) {
-    await kvSet(name, data);
+  const r = getRedis();
+  if (r) {
+    await r.connect().catch(() => {});
+    await r.set(`ds:${name}`, JSON.stringify(data));
   }
-}
-
-async function blobPut(filename, fileData) {
-  if (!BLOB_TOKEN) return { url: '' };
-  const res = await fetch(`https://blob.vercel-storage.com/${encodeURIComponent(filename)}`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${BLOB_TOKEN}`,
-      'Content-Type': 'application/octet-stream',
-      'x-api-config': JSON.stringify({ access: 'public' })
-    },
-    body: fileData
-  });
-  return res.json();
-}
-
-async function blobList() {
-  if (!BLOB_TOKEN) return { blobs: [] };
-  const res = await fetch('https://blob.vercel-storage.com', {
-    headers: { Authorization: `Bearer ${BLOB_TOKEN}` }
-  });
-  return res.json();
-}
-
-async function blobDelete(url) {
-  if (!BLOB_TOKEN) return;
-  await fetch('https://blob.vercel-storage.com', {
-    method: 'DELETE',
-    headers: {
-      Authorization: `Bearer ${BLOB_TOKEN}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ urls: [url] })
-  });
 }
 
 function parseMultipart(buffer, boundary) {
@@ -135,6 +95,63 @@ function parseMultipart(buffer, boundary) {
       const clean = raw.replace(/\r\n--$/, '').replace(/\r\n$/, '');
       return { filename: fileMatch[1], ext, data: Buffer.from(clean, 'binary') };
     }
+  }
+  return null;
+}
+
+async function blobPut(filename, fileData) {
+  const r = getRedis();
+  if (r) {
+    await r.connect().catch(() => {});
+    const b64 = fileData.toString('base64');
+    const mime = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', gif: 'image/gif', webp: 'image/webp', svg: 'image/svg+xml', pdf: 'application/pdf' };
+    const ct = mime[filename.split('.').pop().toLowerCase()] || 'application/octet-stream';
+    await r.set(`ds:file:${filename}`, b64);
+    await r.rpush('ds:filelist', JSON.stringify({ name: filename, url: `/api/uploads/${filename}`, contentType: ct }));
+    return { url: `/api/uploads/${filename}`, filename };
+  }
+  return { url: '', filename };
+}
+
+async function blobList() {
+  const r = getRedis();
+  if (r) {
+    await r.connect().catch(() => {});
+    const list = await r.lrange('ds:filelist', 0, -1);
+    return list.map(s => JSON.parse(s));
+  }
+  return [];
+}
+
+async function blobDelete(filename) {
+  const r = getRedis();
+  if (r) {
+    await r.connect().catch(() => {});
+    await r.del(`ds:file:${filename}`);
+    const list = await r.lrange('ds:filelist', 0, -1);
+    for (const item of list) {
+      const parsed = JSON.parse(item);
+      if (parsed.name === filename) {
+        await r.lrem('ds:filelist', 1, item);
+        break;
+      }
+    }
+  }
+}
+
+async function blobGet(filename) {
+  const r = getRedis();
+  if (r) {
+    await r.connect().catch(() => {});
+    const b64 = await r.get(`ds:file:${filename}`);
+    if (!b64) return null;
+    const list = await r.lrange('ds:filelist', 0, -1);
+    let ct = 'application/octet-stream';
+    for (const item of list) {
+      const parsed = JSON.parse(item);
+      if (parsed.name === filename && parsed.contentType) { ct = parsed.contentType; break; }
+    }
+    return { data: Buffer.from(b64, 'base64'), contentType: ct };
   }
   return null;
 }
@@ -274,17 +291,26 @@ module.exports = async (req, res) => {
       return json(res, 200, { url: blob.url || '', filename: blobName });
     }
 
-    if (path === '/uploads' && method === 'GET') {
-      if (!authCheck(req)) return json(res, 401, { error: 'Unauthorized' });
-      const data = await blobList();
-      const blobs = data.blobs || [];
-      return json(res, 200, blobs.map(b => ({ name: b.pathname, url: b.url })));
+    const fileServeMatch = path.match(/^\/uploads\/(.+)$/);
+    if (fileServeMatch && method === 'GET') {
+      const filename = fileServeMatch[1];
+      const file = await blobGet(filename);
+      if (!file) return json(res, 404, { error: 'File not found' });
+      res.setHeader('Content-Type', file.contentType);
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      res.end(file.data);
+      return;
     }
 
-    const uploadDeleteMatch = path.match(/^\/uploads\/(.+)$/);
-    if (uploadDeleteMatch && method === 'DELETE') {
+    if (path === '/uploads' && method === 'GET') {
       if (!authCheck(req)) return json(res, 401, { error: 'Unauthorized' });
-      await blobDelete(decodeURIComponent(uploadDeleteMatch[1]));
+      const files = await blobList();
+      return json(res, 200, files);
+    }
+
+    if (fileServeMatch && method === 'DELETE') {
+      if (!authCheck(req)) return json(res, 401, { error: 'Unauthorized' });
+      await blobDelete(fileServeMatch[1]);
       return json(res, 200, { success: true });
     }
 
