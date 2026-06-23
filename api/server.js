@@ -1,11 +1,15 @@
 const cookie = require('cookie');
 const Redis = require('ioredis');
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
-const SECRET = process.env.SESSION_SECRET || 'design-sreda-secret-2026';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+const SECRET = process.env.SESSION_SECRET;
 const REDIS_URL = process.env.REDIS_URL || '';
 const TG_BOT_TOKEN = process.env.TG_BOT_TOKEN || '';
 const TG_CHAT_ID = process.env.TG_CHAT_ID || '';
+
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || '').split(',').filter(Boolean);
+const MAX_BODY_BYTES = 5 * 1024 * 1024;
+const MAX_SEND_LENGTH = 4000;
 
 let redis = null;
 function getRedis() {
@@ -43,11 +47,23 @@ function authCheck(req) {
   return cookies.admin_token === simpleHash(SECRET);
 }
 
-function setCORS(res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+function setCORS(req, res) {
+  const origin = req.headers.origin || '';
+  if (ALLOWED_ORIGINS.length === 0 || ALLOWED_ORIGINS.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin || '*');
+  }
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
+}
+
+function setSecurityHeaders(res) {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  res.setHeader('Strict-Transport-Security', 'max-age=63072000; includeSubDomains');
 }
 
 function json(res, status, data) {
@@ -58,7 +74,15 @@ function json(res, status, data) {
 function readBody(req) {
   return new Promise((resolve, reject) => {
     const chunks = [];
-    req.on('data', c => chunks.push(c));
+    let total = 0;
+    req.on('data', c => {
+      total += c.length;
+      if (total > MAX_BODY_BYTES) {
+        req.destroy();
+        return reject(new Error('Body too large'));
+      }
+      chunks.push(c);
+    });
     req.on('end', () => resolve(Buffer.concat(chunks)));
     req.on('error', reject);
   });
@@ -159,7 +183,8 @@ async function blobGet(filename) {
 }
 
 module.exports = async (req, res) => {
-  setCORS(res);
+  setCORS(req, res);
+  setSecurityHeaders(res);
 
   if (req.method === 'OPTIONS') {
     res.status(200).end();
@@ -176,17 +201,20 @@ module.exports = async (req, res) => {
 
   try {
     if (path === '/login' && method === 'POST') {
+      if (!ADMIN_PASSWORD) return json(res, 500, { error: 'Server not configured' });
       const buf = await readBody(req);
       const { password } = JSON.parse(buf.toString());
-      if (password === ADMIN_PASSWORD) {
-        res.setHeader('Set-Cookie', cookie.serialize('admin_token', simpleHash(SECRET), { httpOnly: true, maxAge: 86400000, path: '/' }));
-        return json(res, 200, { success: true });
+      if (typeof password !== 'string' || password !== ADMIN_PASSWORD) {
+        return json(res, 401, { error: 'Wrong password' });
       }
-      return json(res, 401, { error: 'Wrong password' });
+      res.setHeader('Set-Cookie', cookie.serialize('admin_token', simpleHash(SECRET), {
+        httpOnly: true, secure: true, sameSite: 'Strict', maxAge: 86400000, path: '/'
+      }));
+      return json(res, 200, { success: true });
     }
 
     if (path === '/logout' && method === 'POST') {
-      res.setHeader('Set-Cookie', cookie.serialize('admin_token', '', { httpOnly: true, maxAge: 0, path: '/' }));
+      res.setHeader('Set-Cookie', cookie.serialize('admin_token', '', { httpOnly: true, secure: true, sameSite: 'Strict', maxAge: 0, path: '/' }));
       return json(res, 200, { success: true });
     }
 
@@ -334,31 +362,30 @@ module.exports = async (req, res) => {
     if (path === '/send' && method === 'POST') {
       const buf = await readBody(req);
       const { name, text } = JSON.parse(buf.toString());
-      if (!text) return json(res, 400, { error: 'No text' });
+      if (!text || typeof text !== 'string') return json(res, 400, { error: 'No text' });
+      if (text.length > MAX_SEND_LENGTH) return json(res, 400, { error: 'Message too long' });
 
-      const hasToken = !!TG_BOT_TOKEN;
-      const hasChat = !!TG_CHAT_ID;
-      console.log('[send] token set:', hasToken, '| chat set:', hasChat);
+      const safeName = typeof name === 'string' ? name.slice(0, 100) : '';
+      const safeText = text.slice(0, MAX_SEND_LENGTH);
 
-      if (hasToken && hasChat) {
-        try {
-          const tgRes = await fetch('https://api.telegram.org/bot' + TG_BOT_TOKEN + '/sendMessage', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chat_id: TG_CHAT_ID, text: text })
-          });
-          const tgBody = await tgRes.text();
-          console.log('[send] tg response:', tgRes.status, tgBody);
-          if (!tgRes.ok) {
-            return json(res, 502, { error: 'Telegram API error', details: tgBody });
-          }
-        } catch (e) {
-          console.error('[send] fetch failed:', e.message);
-          return json(res, 502, { error: 'Failed to reach Telegram' });
+      if (!TG_BOT_TOKEN || !TG_CHAT_ID) {
+        console.error('[send] missing env vars');
+        return json(res, 503, { error: 'Service not configured' });
+      }
+
+      try {
+        const tgRes = await fetch('https://api.telegram.org/bot' + TG_BOT_TOKEN + '/sendMessage', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: TG_CHAT_ID, text: safeText })
+        });
+        console.log('[send] tg status:', tgRes.status);
+        if (!tgRes.ok) {
+          return json(res, 502, { error: 'Failed to send message' });
         }
-      } else {
-        console.error('[send] missing env vars — token:', hasToken, 'chat:', hasChat);
-        return json(res, 500, { error: 'TG_BOT_TOKEN or TG_CHAT_ID not configured', tokenSet: hasToken, chatSet: hasChat });
+      } catch (e) {
+        console.error('[send] fetch failed:', e.message);
+        return json(res, 502, { error: 'Failed to reach Telegram' });
       }
 
       return json(res, 200, { success: true });
@@ -366,6 +393,7 @@ module.exports = async (req, res) => {
 
     json(res, 404, { error: 'Not found' });
   } catch (err) {
-    json(res, 500, { error: err.message });
+    console.error('[api] error:', err.message);
+    json(res, 500, { error: 'Internal server error' });
   }
 };

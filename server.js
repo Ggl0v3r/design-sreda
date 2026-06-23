@@ -6,8 +6,8 @@ const cookieParser = require('cookie-parser');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
-const SECRET = process.env.SESSION_SECRET || 'design-sreda-secret-2026';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+const SECRET = process.env.SESSION_SECRET;
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
@@ -52,20 +52,30 @@ function authCheck(req, res, next) {
   return res.redirect('/admin/login.html');
 }
 
-app.use(express.static(__dirname));
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  next();
+});
+
+const PUBLIC_DIR = __dirname;
+app.use(express.static(PUBLIC_DIR));
 app.use('/admin', express.static(path.join(__dirname, 'admin')));
 app.use('/uploads', express.static(UPLOADS_DIR));
-app.use('/data', express.static(DATA_DIR));
 
 app.post('/api/login', (req, res) => {
-  if (req.body.password === ADMIN_PASSWORD) {
-    res.cookie('admin_token', simpleHash(SECRET), {
-      httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000
-    });
-    return res.json({ success: true });
+  if (!ADMIN_PASSWORD) return res.status(500).json({ error: 'Server not configured' });
+  if (typeof req.body.password !== 'string' || req.body.password !== ADMIN_PASSWORD) {
+    return res.status(401).json({ error: 'Wrong password' });
   }
-  res.status(401).json({ error: 'Wrong password' });
+  res.cookie('admin_token', simpleHash(SECRET), {
+    httpOnly: true, secure: true, sameSite: 'Strict',
+    maxAge: 24 * 60 * 60 * 1000
+  });
+  return res.json({ success: true });
 });
 
 app.post('/api/logout', (req, res) => {
@@ -161,7 +171,9 @@ app.get('/api/uploads', authCheck, (req, res) => {
 });
 
 app.delete('/api/uploads/:filename', authCheck, (req, res) => {
-  const fp = path.join(UPLOADS_DIR, req.params.filename);
+  const safeName = path.basename(req.params.filename);
+  const fp = path.join(UPLOADS_DIR, safeName);
+  if (!fp.startsWith(UPLOADS_DIR)) return res.status(400).json({ error: 'Invalid filename' });
   if (fs.existsSync(fp)) fs.unlinkSync(fp);
   res.json({ success: true });
 });
