@@ -336,14 +336,24 @@ module.exports = async (req, res) => {
       const { name, text } = JSON.parse(buf.toString());
       if (!text) return json(res, 400, { error: 'No text' });
 
-      const msg = (name ? '*' + name + '*\n\n' : '') + text;
+      const msg = text;
 
       if (TG_BOT_TOKEN && TG_CHAT_ID) {
-        await fetch('https://api.telegram.org/bot' + TG_BOT_TOKEN + '/sendMessage', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chat_id: TG_CHAT_ID, text: msg, parse_mode: 'Markdown' })
-        });
+        try {
+          const tgRes = await fetch('https://api.telegram.org/bot' + TG_BOT_TOKEN + '/sendMessage', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: TG_CHAT_ID, text: msg })
+          });
+          if (!tgRes.ok) {
+            const tgErr = await tgRes.text();
+            console.error('Telegram error:', tgRes.status, tgErr);
+          }
+        } catch (e) {
+          console.error('Telegram fetch failed:', e.message);
+        }
+      } else {
+        console.error('TG_BOT_TOKEN or TG_CHAT_ID not set');
       }
 
       return json(res, 200, { success: true });

@@ -242,10 +242,10 @@ document.getElementById('contactForm').addEventListener('submit', async function
   var phone = document.getElementById('contactPhone').value.trim();
   var message = document.getElementById('contactMessage').value.trim();
 
-  var text = '*Новая заявка с сайта*\n\n' +
-    '*Имя:* ' + name + '\n' +
-    (phone ? '*Телефон:* ' + phone + '\n' : '') +
-    '*Сообщение:*\n' + message;
+  var text = 'Новая заявка с сайта\n\n' +
+    'Имя: ' + name + '\n' +
+    (phone ? 'Телефон: ' + phone + '\n' : '') +
+    'Сообщение:\n' + message;
 
   btn.textContent = 'Отправка...';
   btn.disabled = true;
