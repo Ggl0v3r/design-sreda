@@ -6,6 +6,12 @@ const KV_URL = process.env.KV_REST_API_URL || '';
 const KV_TOKEN = process.env.KV_REST_API_TOKEN || '';
 const BLOB_TOKEN = process.env.BLOB_READ_WRITE_TOKEN || '';
 
+const DEFAULTS = {
+  content: require('../data/content.json'),
+  works: require('../data/works.json'),
+  calculator: require('../data/calculator.json')
+};
+
 function simpleHash(str) {
   let h = 0;
   for (let i = 0; i < str.length; i++) {
@@ -28,7 +34,7 @@ function authCheck(req) {
   return cookies.admin_token === simpleHash(SECRET);
 }
 
-function cors(res) {
+function setCORS(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -38,6 +44,15 @@ function cors(res) {
 function json(res, status, data) {
   res.status(status).setHeader('Content-Type', 'application/json');
   res.end(JSON.stringify(data));
+}
+
+function readBody(req) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    req.on('data', c => chunks.push(c));
+    req.on('end', () => resolve(Buffer.concat(chunks)));
+    req.on('error', reject);
+  });
 }
 
 async function kvGet(key) {
@@ -61,19 +76,21 @@ async function kvSet(key, value) {
 async function readJSON(name) {
   const data = await kvGet(name);
   if (data) return data;
-  const defaults = { content: require('../data/content.json'), works: require('../data/works.json'), calculator: require('../data/calculator.json') };
-  if (defaults[name]) {
-    await kvSet(name, defaults[name]);
-    return defaults[name];
+  if (DEFAULTS[name]) {
+    if (KV_URL) await kvSet(name, DEFAULTS[name]);
+    return JSON.parse(JSON.stringify(DEFAULTS[name]));
   }
   return null;
 }
 
 async function writeJSON(name, data) {
-  await kvSet(name, data);
+  if (KV_URL) {
+    await kvSet(name, data);
+  }
 }
 
 async function blobPut(filename, fileData) {
+  if (!BLOB_TOKEN) return { url: '' };
   const res = await fetch(`https://blob.vercel-storage.com/${encodeURIComponent(filename)}`, {
     method: 'POST',
     headers: {
@@ -87,6 +104,7 @@ async function blobPut(filename, fileData) {
 }
 
 async function blobList() {
+  if (!BLOB_TOKEN) return { blobs: [] };
   const res = await fetch('https://blob.vercel-storage.com', {
     headers: { Authorization: `Bearer ${BLOB_TOKEN}` }
   });
@@ -94,6 +112,7 @@ async function blobList() {
 }
 
 async function blobDelete(url) {
+  if (!BLOB_TOKEN) return;
   await fetch('https://blob.vercel-storage.com', {
     method: 'DELETE',
     headers: {
@@ -104,8 +123,24 @@ async function blobDelete(url) {
   });
 }
 
+function parseMultipart(buffer, boundary) {
+  const parts = buffer.toString('binary').split('--' + boundary);
+  for (const part of parts) {
+    const fileMatch = part.match(/filename="(.+?)"/);
+    if (fileMatch) {
+      const ext = fileMatch[1].split('.').pop();
+      const headerEnd = part.indexOf('\r\n\r\n');
+      if (headerEnd === -1) continue;
+      const raw = part.substring(headerEnd + 4);
+      const clean = raw.replace(/\r\n--$/, '').replace(/\r\n$/, '');
+      return { filename: fileMatch[1], ext, data: Buffer.from(clean, 'binary') };
+    }
+  }
+  return null;
+}
+
 module.exports = async (req, res) => {
-  cors(res);
+  setCORS(res);
 
   if (req.method === 'OPTIONS') {
     res.status(200).end();
@@ -113,14 +148,17 @@ module.exports = async (req, res) => {
   }
 
   const url = new URL(req.url, 'http://localhost');
-  const path = url.pathname.replace('/api', '') || '/';
+  let path = url.pathname;
+  if (path.startsWith('/api/')) path = path.slice(4);
+  else if (path.startsWith('/api')) path = path.slice(4);
+  if (!path.startsWith('/')) path = '/' + path;
+
   const method = req.method;
 
   try {
     if (path === '/login' && method === 'POST') {
-      let body = '';
-      for await (const chunk of req) body += chunk;
-      const { password } = JSON.parse(body);
+      const buf = await readBody(req);
+      const { password } = JSON.parse(buf.toString());
       if (password === ADMIN_PASSWORD) {
         res.setHeader('Set-Cookie', cookie.serialize('admin_token', simpleHash(SECRET), { httpOnly: true, maxAge: 86400000, path: '/' }));
         return json(res, 200, { success: true });
@@ -144,9 +182,8 @@ module.exports = async (req, res) => {
 
     if (path === '/content' && method === 'PUT') {
       if (!authCheck(req)) return json(res, 401, { error: 'Unauthorized' });
-      let body = '';
-      for await (const chunk of req) body += chunk;
-      await writeJSON('content', JSON.parse(body));
+      const buf = await readBody(req);
+      await writeJSON('content', JSON.parse(buf.toString()));
       return json(res, 200, { success: true });
     }
 
@@ -161,10 +198,9 @@ module.exports = async (req, res) => {
 
     if (contentPageMatch && method === 'PUT') {
       if (!authCheck(req)) return json(res, 401, { error: 'Unauthorized' });
-      let body = '';
-      for await (const chunk of req) body += chunk;
+      const buf = await readBody(req);
       const content = await readJSON('content');
-      content[contentPageMatch[1]] = JSON.parse(body);
+      content[contentPageMatch[1]] = JSON.parse(buf.toString());
       await writeJSON('content', content);
       return json(res, 200, { success: true });
     }
@@ -176,11 +212,10 @@ module.exports = async (req, res) => {
 
     if (path === '/works' && method === 'POST') {
       if (!authCheck(req)) return json(res, 401, { error: 'Unauthorized' });
-      let body = '';
-      for await (const chunk of req) body += chunk;
+      const buf = await readBody(req);
       const works = await readJSON('works');
       const maxId = works.works.reduce((max, w) => Math.max(max, w.id), 0);
-      const newWork = { ...JSON.parse(body), id: maxId + 1 };
+      const newWork = { ...JSON.parse(buf.toString()), id: maxId + 1 };
       works.works.push(newWork);
       await writeJSON('works', works);
       return json(res, 200, newWork);
@@ -197,12 +232,11 @@ module.exports = async (req, res) => {
 
     if (workIdMatch && method === 'PUT') {
       if (!authCheck(req)) return json(res, 401, { error: 'Unauthorized' });
-      let body = '';
-      for await (const chunk of req) body += chunk;
+      const buf = await readBody(req);
       const works = await readJSON('works');
       const idx = works.works.findIndex(w => w.id === Number(workIdMatch[1]));
       if (idx === -1) return json(res, 404, { error: 'Work not found' });
-      works.works[idx] = { ...works.works[idx], ...JSON.parse(body), id: Number(workIdMatch[1]) };
+      works.works[idx] = { ...works.works[idx], ...JSON.parse(buf.toString()), id: Number(workIdMatch[1]) };
       await writeJSON('works', works);
       return json(res, 200, works.works[idx]);
     }
@@ -222,9 +256,8 @@ module.exports = async (req, res) => {
 
     if (path === '/calculator' && method === 'PUT') {
       if (!authCheck(req)) return json(res, 401, { error: 'Unauthorized' });
-      let body = '';
-      for await (const chunk of req) body += chunk;
-      await writeJSON('calculator', JSON.parse(body));
+      const buf = await readBody(req);
+      await writeJSON('calculator', JSON.parse(buf.toString()));
       return json(res, 200, { success: true });
     }
 
@@ -233,24 +266,12 @@ module.exports = async (req, res) => {
       const contentType = req.headers['content-type'] || '';
       const boundaryMatch = contentType.match(/boundary=(.+)/);
       if (!boundaryMatch) return json(res, 400, { error: 'No boundary' });
-      const chunks = [];
-      for await (const chunk of req) chunks.push(chunk);
-      const buffer = Buffer.concat(chunks);
-      const boundary = boundaryMatch[1];
-      const parts = buffer.toString('binary').split('--' + boundary);
-      for (const part of parts) {
-        const fileMatch = part.match(/filename="(.+?)"/);
-        if (fileMatch) {
-          const ext = fileMatch[1].split('.').pop();
-          const filename = Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + ext;
-          const headerEnd = part.indexOf('\r\n\r\n');
-          const raw = part.substring(headerEnd + 4);
-          const fileData = Buffer.from(raw.replace(/\r\n--$/, ''), 'binary');
-          const blob = await blobPut(filename, fileData);
-          return json(res, 200, { url: blob.url || '', filename });
-        }
-      }
-      return json(res, 400, { error: 'No file' });
+      const buf = await readBody(req);
+      const file = parseMultipart(buf, boundaryMatch[1]);
+      if (!file) return json(res, 400, { error: 'No file' });
+      const blobName = Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + file.ext;
+      const blob = await blobPut(blobName, file.data);
+      return json(res, 200, { url: blob.url || '', filename: blobName });
     }
 
     if (path === '/uploads' && method === 'GET') {

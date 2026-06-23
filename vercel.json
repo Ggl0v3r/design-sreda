@@ -1,9 +1,14 @@
 {
+  "version": 2,
   "builds": [
     { "src": "api/server.js", "use": "@vercel/node" }
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/server.js" },
+    { "src": "/admin/(.*)", "dest": "/admin/$1" },
+    { "src": "/images/(.*)", "dest": "/images/$1" },
+    { "src": "/uploads/(.*)", "dest": "/uploads/$1" },
+    { "src": "/data/(.*)", "dest": "/data/$1" },
     { "handle": "filesystem" }
   ]
 }
