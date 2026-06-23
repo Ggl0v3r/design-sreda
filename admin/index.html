@@ -8,6 +8,13 @@
 <link rel="stylesheet" href="/admin/styles.css">
 </head>
 <body>
+<div class="mobile-topbar">
+  <h2>Дизайн среда</h2>
+  <div class="mobile-topbar-btns">
+    <a href="/" target="_blank">Сайт</a>
+    <button id="logoutBtnMob">Выйти</button>
+  </div>
+</div>
 <div class="layout">
   <aside class="sidebar">
     <div class="sidebar-header">
@@ -129,6 +136,11 @@ async function loadDashboard() {
 document.getElementById('refreshBtn').addEventListener('click', loadDashboard);
 
 document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+  e.preventDefault();
+  await fetch('/api/logout', { method: 'POST' });
+  window.location.href = '/admin/login.html';
+});
+document.getElementById('logoutBtnMob').addEventListener('click', async (e) => {
   e.preventDefault();
   await fetch('/api/logout', { method: 'POST' });
   window.location.href = '/admin/login.html';

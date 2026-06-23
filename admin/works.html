@@ -8,6 +8,13 @@
 <link rel="stylesheet" href="/admin/styles.css">
 </head>
 <body>
+<div class="mobile-topbar">
+  <h2>Галерея работ</h2>
+  <div class="mobile-topbar-btns">
+    <a href="/admin/">Назад</a>
+    <button id="logoutBtnMob">Выйти</button>
+  </div>
+</div>
 <div class="layout">
   <aside class="sidebar">
     <div class="sidebar-header">
@@ -254,6 +261,11 @@ document.getElementById('deleteBtn').addEventListener('click', async () => {
 });
 
 document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+  e.preventDefault();
+  await fetch('/api/logout', { method: 'POST' });
+  window.location.href = '/admin/login.html';
+});
+document.getElementById('logoutBtnMob').addEventListener('click', async (e) => {
   e.preventDefault();
   await fetch('/api/logout', { method: 'POST' });
   window.location.href = '/admin/login.html';
