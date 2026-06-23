@@ -192,6 +192,17 @@ module.exports = async (req, res) => {
       return json(res, 200, { authenticated: authCheck(req) });
     }
 
+    if (path === '/content/public' && method === 'GET') {
+      return json(res, 200, await readJSON('content'));
+    }
+
+    if (path === '/content/public/:page' && method === 'GET') {
+      const content = await readJSON('content');
+      const page = content[req.url.split('/').pop()];
+      if (page) return json(res, 200, page);
+      return json(res, 404, { error: 'Page not found' });
+    }
+
     if (path === '/content' && method === 'GET') {
       if (!authCheck(req)) return json(res, 401, { error: 'Unauthorized' });
       return json(res, 200, await readJSON('content'));
@@ -220,6 +231,10 @@ module.exports = async (req, res) => {
       content[contentPageMatch[1]] = JSON.parse(buf.toString());
       await writeJSON('content', content);
       return json(res, 200, { success: true });
+    }
+
+    if (path === '/works/public' && method === 'GET') {
+      return json(res, 200, await readJSON('works'));
     }
 
     if (path === '/works' && method === 'GET') {

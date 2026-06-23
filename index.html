@@ -188,7 +188,7 @@
         <a class="btn btn-ghost" href="work.html">Все проекты →</a>
       </div>
 
-      <div class="work-grid">
+      <div class="work-grid" id="workTeaserGrid">
         <div class="card reveal">
           <div class="card-carousel" data-carousel>
             <div class="slides">
@@ -314,6 +314,41 @@
 </footer>
 
 <script src="script.js"></script>
+<script>
+(async function(){
+  var grid = document.getElementById('workTeaserGrid');
+  if (!grid) return;
+  try {
+    var res = await fetch('/api/works/public');
+    var data = await res.json();
+    var works = (data.works || []).slice(0, 4);
+    if (works.length === 0) return;
+
+    grid.innerHTML = works.map(function(w) {
+      var imgs = (w.images || []).slice(0, 3).map(function(src) {
+        return '<img src="' + src + '" alt="' + (w.title || '') + '" loading="lazy">';
+      }).join('');
+
+      return '<div class="card reveal">' +
+        (imgs ? '<div class="card-carousel" data-carousel>' +
+          '<div class="slides">' + imgs + '</div>' +
+          '<div class="carousel-arrows">' +
+            '<button class="carousel-arrow" data-prev>\u2190</button>' +
+            '<button class="carousel-arrow" data-next>\u2192</button>' +
+          '</div>' +
+          '<div class="carousel-nav"></div>' +
+        '</div>' : '') +
+        (w.tag ? '<p class="tag">' + w.tag + '</p>' : '') +
+        (w.title ? '<h4>' + w.title + '</h4>' : '') +
+        (w.description ? '<p>' + w.description + '</p>' : '') +
+      '</div>';
+    }).join('');
+
+    initReveal();
+    initCarousels();
+  } catch(e) {}
+})();
+</script>
 <script>
   document.body.classList.add('loader-active');
   document.addEventListener('DOMContentLoaded', () => {
