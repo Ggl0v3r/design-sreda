@@ -98,6 +98,30 @@
         </div>
       </div>
 
+      <div style="margin-top:40px;" class="reveal">
+        <div class="card" style="background:var(--charcoal);border-color:var(--line);">
+          <h3 style="color:var(--paper);font-size:1.3rem;">Напишите нам</h3>
+          <p style="color:var(--charcoal-2);margin-bottom:20px;font-size:.95rem;">Заявка уйдёт напрямую в наш Telegram-бот. Ответим в течение дня.</p>
+          <form id="contactForm" style="display:flex;flex-direction:column;gap:16px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+              <div>
+                <label style="display:block;font-size:.82rem;color:var(--brass);margin-bottom:6px;">Имя</label>
+                <input type="text" id="contactName" placeholder="Как к вам обращаться" required style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--line);background:rgba(232,232,240,.04);color:var(--paper);font-family:'Work Sans',sans-serif;font-size:.95rem;">
+              </div>
+              <div>
+                <label style="display:block;font-size:.82rem;color:var(--brass);margin-bottom:6px;">Телефон</label>
+                <input type="tel" id="contactPhone" placeholder="+7 (___) ___-__-__" style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--line);background:rgba(232,232,240,.04);color:var(--paper);font-family:'Work Sans',sans-serif;font-size:.95rem;">
+              </div>
+            </div>
+            <div>
+              <label style="display:block;font-size:.82rem;color:var(--brass);margin-bottom:6px;">Расскажите про объект</label>
+              <textarea id="contactMessage" rows="4" placeholder="Площадь, адрес, что хотите сделать, сроки..." required style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--line);background:rgba(232,232,240,.04);color:var(--paper);font-family:'Work Sans',sans-serif;font-size:.95rem;resize:vertical;"></textarea>
+            </div>
+            <button type="submit" id="contactSendBtn" class="btn btn-accent" style="align-self:flex-start;">Отправить заявку</button>
+          </form>
+        </div>
+      </div>
+
       <div class="info-row reveal">
         <div class="info-chip">
           <p class="eyebrow">Город</p>
@@ -142,5 +166,41 @@
 </footer>
 
 <script src="script.js"></script>
+<script>
+document.getElementById('contactForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  var btn = document.getElementById('contactSendBtn');
+  var name = document.getElementById('contactName').value.trim();
+  var phone = document.getElementById('contactPhone').value.trim();
+  var message = document.getElementById('contactMessage').value.trim();
+
+  var text = '*Новая заявка с сайта*\n\n' +
+    '*Имя:* ' + name + '\n' +
+    (phone ? '*Телефон:* ' + phone + '\n' : '') +
+    '*Сообщение:*\n' + message;
+
+  btn.textContent = 'Отправка...';
+  btn.disabled = true;
+
+  try {
+    var res = await fetch('/api/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name, text: text })
+    });
+    if (res.ok) {
+      btn.textContent = 'Отправлено!';
+      btn.style.background = '#22C55E';
+      document.getElementById('contactForm').reset();
+    } else {
+      throw new Error();
+    }
+  } catch(err) {
+    btn.textContent = 'Ошибка. Попробуйте ещё раз';
+    btn.disabled = false;
+    setTimeout(function() { btn.textContent = 'Отправить заявку'; }, 3000);
+  }
+});
+</script>
 </body>
 </html>

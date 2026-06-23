@@ -4,6 +4,8 @@ const Redis = require('ioredis');
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 const SECRET = process.env.SESSION_SECRET || 'design-sreda-secret-2026';
 const REDIS_URL = process.env.REDIS_URL || '';
+const TG_BOT_TOKEN = process.env.TG_BOT_TOKEN || '';
+const TG_CHAT_ID = process.env.TG_CHAT_ID || '';
 
 let redis = null;
 function getRedis() {
@@ -326,6 +328,24 @@ module.exports = async (req, res) => {
     if (fileServeMatch && method === 'DELETE') {
       if (!authCheck(req)) return json(res, 401, { error: 'Unauthorized' });
       await blobDelete(fileServeMatch[1]);
+      return json(res, 200, { success: true });
+    }
+
+    if (path === '/send' && method === 'POST') {
+      const buf = await readBody(req);
+      const { name, text } = JSON.parse(buf.toString());
+      if (!text) return json(res, 400, { error: 'No text' });
+
+      const msg = (name ? '*' + name + '*\n\n' : '') + text;
+
+      if (TG_BOT_TOKEN && TG_CHAT_ID) {
+        await fetch('https://api.telegram.org/bot' + TG_BOT_TOKEN + '/sendMessage', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: TG_CHAT_ID, text: msg, parse_mode: 'Markdown' })
+        });
+      }
+
       return json(res, 200, { success: true });
     }
 
