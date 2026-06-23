@@ -336,24 +336,29 @@ module.exports = async (req, res) => {
       const { name, text } = JSON.parse(buf.toString());
       if (!text) return json(res, 400, { error: 'No text' });
 
-      const msg = text;
+      const hasToken = !!TG_BOT_TOKEN;
+      const hasChat = !!TG_CHAT_ID;
+      console.log('[send] token set:', hasToken, '| chat set:', hasChat);
 
-      if (TG_BOT_TOKEN && TG_CHAT_ID) {
+      if (hasToken && hasChat) {
         try {
           const tgRes = await fetch('https://api.telegram.org/bot' + TG_BOT_TOKEN + '/sendMessage', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chat_id: TG_CHAT_ID, text: msg })
+            body: JSON.stringify({ chat_id: TG_CHAT_ID, text: text })
           });
+          const tgBody = await tgRes.text();
+          console.log('[send] tg response:', tgRes.status, tgBody);
           if (!tgRes.ok) {
-            const tgErr = await tgRes.text();
-            console.error('Telegram error:', tgRes.status, tgErr);
+            return json(res, 502, { error: 'Telegram API error', details: tgBody });
           }
         } catch (e) {
-          console.error('Telegram fetch failed:', e.message);
+          console.error('[send] fetch failed:', e.message);
+          return json(res, 502, { error: 'Failed to reach Telegram' });
         }
       } else {
-        console.error('TG_BOT_TOKEN or TG_CHAT_ID not set');
+        console.error('[send] missing env vars — token:', hasToken, 'chat:', hasChat);
+        return json(res, 500, { error: 'TG_BOT_TOKEN or TG_CHAT_ID not configured', tokenSet: hasToken, chatSet: hasChat });
       }
 
       return json(res, 200, { success: true });
