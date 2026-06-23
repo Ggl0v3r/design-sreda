@@ -139,7 +139,7 @@ section{padding:120px 0;opacity:1;}
 
 @media (max-width:1000px){
   .nav-links{display:none;}
-  .nav-cta .btn-ghost{display:none;}
+  .nav-cta{display:none;}
   .burger{display:flex;}
 }
 @media (max-width:500px){
